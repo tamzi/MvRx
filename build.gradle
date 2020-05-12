@@ -4,7 +4,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url "https://oss.sonatype.org/service/local/repositories/snapshots/content/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${versions.gradlePlugin}"
@@ -12,9 +11,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
 
         // Upload with:
-        // ./gradlew clean assemble androidSourcesJar androidJavadocsJar uploadArchives --no-daemon --no-parallel
-        // Need to use snapshot version and explicitly include javadoc/sources tasks until
-        // https://github.com/vanniktech/gradle-maven-publish-plugin/issues/54 is fixed
+        // ./gradlew clean uploadArchives --no-daemon --no-parallel
         classpath "com.vanniktech:gradle-maven-publish-plugin:0.9.0"
     }
 
