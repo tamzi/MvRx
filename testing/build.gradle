@@ -1,50 +1,41 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "com.vanniktech.maven.publish"
 
+tasks.withType(KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs += [
+                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+        ]
+    }
+}
+
+
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
     resourcePrefix "mvrx_"
 
     defaultConfig {
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
+        multiDexEnabled true
         consumerProguardFiles "proguard-rules.pro"
     }
 
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput "stdout"
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
-    sourceSets {
-        main.java.srcDirs += "src/main/kotlin"
-        test.java.srcDirs += "src/test/kotlin"
-    }
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {
-    implementation libraries.appcompat
-    implementation libraries.junit
-    implementation libraries.kotlin
-    implementation libraries.kotlinReflect
-    implementation libraries.rxAndroid
-    implementation project(":mvrx")
+    api project(':mvrx-mocking')
+    implementation Libraries.appcompat
+    implementation Libraries.junit
+    implementation Libraries.kotlinReflect
+    implementation Libraries.rxAndroid
+    implementation Libraries.multidex
+    implementation TestLibraries.kotlinCoroutinesTest
+    implementation project(":mvrx-rxjava2")
 }

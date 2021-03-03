@@ -1,7 +1,5 @@
 package com.airbnb.mvrx
 
-import java.util.Arrays
-
 /**
  * The T generic is unused for some classes but since it is sealed and useful for Success and Fail,
  * it should be on all of them.
@@ -54,11 +52,12 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
      * you could map a network request to just the data you need in the value, but your base layers could
      * keep metadata about the request, like timing, for logging.
      *
-     * @see BaseMvRxViewModel.execute
+     * @see MavericksViewModel.execute
      * @see Async.setMetadata
      * @see Async.getMetadata
      */
-    internal var metadata: Any? = null
+    @InternalMavericksApi
+    var metadata: Any? = null
 }
 
 data class Fail<out T>(val error: Throwable, private val value: T? = null) : Async<T>(complete = true, shouldLoad = true, value = value) {
@@ -71,7 +70,7 @@ data class Fail<out T>(val error: Throwable, private val value: T? = null) : Asy
             error.stackTrace.firstOrNull() == otherError.stackTrace.firstOrNull()
     }
 
-    override fun hashCode(): Int = Arrays.hashCode(arrayOf(error::class, error.message, error.stackTrace[0]))
+    override fun hashCode(): Int = arrayOf(error::class, error.message, error.stackTrace.firstOrNull()).contentHashCode()
 }
 
 /**

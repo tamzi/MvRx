@@ -1,4 +1,73 @@
-# Change log
+# Change Log
+
+## 2.1.0
+- Upgraded to Kotlin 1.4.30.
+- Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
+- Created initial release of [mavericks-compose](https://airbnb.io/mavericks/#/jetpack-compose).
+
+### Breaking Changes
+- ActivityViewModelContext and MavericksViewModelFactory now uses ComponentActivity instead of FragmentActivity to improve Compose interop. ComponentActivity is the super class of FragmentActivity so you may need to replace FragmentActivity with ComponentActivity if you using ActivityViewModelContext.
+
+## Version 2.0.0
+Mavericks 2.0 is a ground up rewrite for coroutines. Check out the [documentation for 2.0](https://airbnb.io/mavericks/#/new-2x) to find out what is new and how to upgrade.
+
+### Breaking Changes
+- All `mvrx` artifact names are now `mavericks`.
+- If you are using RxJava, you will need to use `mavericks-rxjava2` to maintain backwards compatibility. New Mavericks users who just use coroutines can just use `mavericks`.
+- If your MavericksView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class
+- MavericksViewModel and BaseMvRxViewModel (from mavericks-rxjava2) no longer extends Jetpack ViewModel. However, `viewModelScope` and `onCleared()` still exist to match the existing API
+- The order of nested with and set states has changed slightly. It now matches the original intention.
+If you had code like:
+```kotlin
+withState {
+    // W1
+    withState {
+        // W2
+    }
+    setState {
+        // S1
+        setState {
+            // S2
+            setState {
+                // S3
+            }
+        }
+    }
+}
+```
+Previously, setState would only be prioritized at that nesting level so it would run:
+[W1, S1, W2, S2, S3]
+Now, it will run:
+[W1, S1, S2, S3, W2]
+- viewModelScope is now a property on MavericksViewModel and BaseMvRxViewModel (from mavericks-rxjava2), not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused
+- If you had been using any restricted internal mavericks library functions your build may break as they have been renamed (you shouldn't be doing this, but in case you are...)
+
+### Other Changes
+- Make MavericksViewModel extension functions protected (#488)
+- Add MavericksViewModel.awaitState (#487) to access current ViewModel state via a suspend function
+- Mark all @RestrictTo APIs with @InternalMavericksApi (#480)
+- Api additions to the mocking framework (#475) (#477)
+- Migrated CoroutinesStateStore to SharedFlow (#469)
+- Launcher and mock speed optimizations (#468)
+- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext. (#443)
+- Add mavericks-navigation artifact to support AndroidX Navigation destination ViewModels `navGraphViewModel(R.id.my_graph)` (#443)
+
+## Version 1.5.1
+- Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
+
+## Version 1.5.0
+- Add an optional nullable value to all Async classes (#383)
+- Update various dependencies
+
+Note: MvRx now targets 1.8 for Java/Kotlin, so you may need to update your projects to also target
+1.8
+```
+android {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+```
 
 ## Version 1.4.0
 - Remove Kotlin-Reflect entirely (#334)

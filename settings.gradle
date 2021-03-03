@@ -1,10 +1,17 @@
 // Libraries
-include ":mvrx"
-include ":testing"
+include ':mvrx'
+include ':mvrx-compose'
+include ':mvrx-mocking'
+include ':mvrx-navigation'
+include ':mvrx-rxjava2'
+include ':launcher'
+include ':testing'
 
 // Samples
-include ":counter"
-include ":dogs"
-include ":hellodagger"
-include ":sample"
-include ":todomvrx"
+include ':counter'
+include ':dogs'
+include ':hellodagger'
+include ':sample'
+include ':sample-compose'
+include ':sample-navigation'
+include ':todomvrx'
